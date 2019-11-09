@@ -3,6 +3,7 @@ title: 拟随感录1：历史的反戈
 tags:
 - 闲言絮语
 - 拟随感录
+cover: /covers/thoughts.png
 key: 2019-11-09.history-and-hero
 ---
 

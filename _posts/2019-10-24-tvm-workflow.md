@@ -7,6 +7,7 @@ tags:
 - 机器学习
 aside:
   toc: true
+cover: /covers/TVM.png
 key: 2019-10-24.tvm-workflow
 ---
 
