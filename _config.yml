@@ -85,7 +85,7 @@ toc:
 ##############################
 ## Mathjax
 mathjax: true
-mathjax_autoNumber: false
+mathjax_autoNumber: true
 
 ## Mermaid
 mermaid: true
