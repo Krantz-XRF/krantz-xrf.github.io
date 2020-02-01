@@ -31,4 +31,4 @@ BasedOnStyle: Microsoft
 
 #### 你也使用Haskell语言吗？
 
-也许你会想看看[FreeType](https://github.com/Krantz-XRF/FreeType)库，这是一个FreeType库的Haskell绑定。这个库目前仍在开发中，不过一些基础功能已经可以使用了。这个库目前尚未发布到Hackage，不过我有一个自己维护的在线Haddock文档，欢迎再[这里](/FreeType)查看。
+也许你会想看看[FreeType](https://github.com/Krantz-XRF/FreeType)库，这是一个FreeType库的Haskell绑定。这个库目前仍在开发中，不过一些基础功能已经可以使用了。这个库目前尚未发布到Hackage，不过我有一个自己维护的在线Haddock文档，欢迎在[这里](/FreeType)查看。
