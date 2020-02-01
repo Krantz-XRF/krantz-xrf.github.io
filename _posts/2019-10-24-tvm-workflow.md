@@ -7,7 +7,6 @@ tags:
 - 机器学习
 aside:
   toc: true
-cover: /covers/TVM.png
 key: 2019-10-24.tvm-workflow
 ---
 
@@ -69,42 +68,42 @@ graph TD
 Input(输入)-->|sch|normalize
 subgraph lower
 subgraph form_body
-	normalize(normalize)-->|sch|ops(schedule.ScheduleOps)
-	normalize-->|sch|infer(schedule.InferBounds)
-	infer-->|bounds|ops
-	ops-->inject(ir_pass.InjectPrefetch)
+    normalize(normalize)-->|sch|ops(schedule.ScheduleOps)
+    normalize-->|sch|infer(schedule.InferBounds)
+    infer-->|bounds|ops
+    ops-->inject(ir_pass.InjectPrefetch)
 end
 subgraph phase 0
-	inject-->custom0(custom)
-	style custom0 fill:none,stroke-dasharray:5,5
+    inject-->custom0(custom)
+    style custom0 fill:none,stroke-dasharray:5,5
 end
 subgraph phase 1
-	custom0-->flatten(ir_pass.StorageFlatten)
-	flatten-->simpl(ir_pass.CanonicalSimplify)
-	simpl-->custom1(custom)
-	style custom1 fill:none,stroke-dasharray:5,5
+    custom0-->flatten(ir_pass.StorageFlatten)
+    flatten-->simpl(ir_pass.CanonicalSimplify)
+    simpl-->custom1(custom)
+    style custom1 fill:none,stroke-dasharray:5,5
 end
 subgraph phase 2
-	custom1-->loop_part(<i>NOT simple_mode?</i>:<br>ir_pass.LoopPartition)
-	loop_part-->|dis_vec?|no_vec(ir_pass.SkipVectorize)
-	loop_part-->|otherwise|with_vec(is_pass.VectorizeLoop)
-	no_vec-->inj(ir_pass.InjectVirtualThread)
-	with_vec-->inj
-	inj-->inj2(ir_pass.InjectDoubleBuffer)
-	inj2-->rewrite(ir_pass.StorageRewrite)
-	rewrite-->unroll(ir_pass.UnrollLoop)
-	unroll-->custom2(custom)
-	style custom2 fill:none,stroke-dasharray:5,5
+    custom1-->loop_part(<i>NOT simple_mode?</i>:<br>ir_pass.LoopPartition)
+    loop_part-->|dis_vec?|no_vec(ir_pass.SkipVectorize)
+    loop_part-->|otherwise|with_vec(is_pass.VectorizeLoop)
+    no_vec-->inj(ir_pass.InjectVirtualThread)
+    with_vec-->inj
+    inj-->inj2(ir_pass.InjectDoubleBuffer)
+    inj2-->rewrite(ir_pass.StorageRewrite)
+    rewrite-->unroll(ir_pass.UnrollLoop)
+    unroll-->custom2(custom)
+    style custom2 fill:none,stroke-dasharray:5,5
 end
 subgraph phase 3
-	custom2-->simpl2(ir_pass.Simplify)
-	simpl2-->lower(ir_pass.LowerStorageAccessInfo)
-	lower-->rmv(ir_pass.RemoveNoOps)
-	rmv-->sel(<i>NOT disable_select_rewriting?</i>:<br>ir_pass.RewriteUnsafeSelect)
-	sel-->custom3(custom)
-	style custom3 fill:none,stroke-dasharray:5,5
-	custom3-->bound(<i>instrument_bounds_checkers?</i>:<br>ir_pass.InstrumentBoundsCheckers)
-	bound-->|otherwise|make(ir_pass.MakeAPI)
+    custom2-->simpl2(ir_pass.Simplify)
+    simpl2-->lower(ir_pass.LowerStorageAccessInfo)
+    lower-->rmv(ir_pass.RemoveNoOps)
+    rmv-->sel(<i>NOT disable_select_rewriting?</i>:<br>ir_pass.RewriteUnsafeSelect)
+    sel-->custom3(custom)
+    style custom3 fill:none,stroke-dasharray:5,5
+    custom3-->bound(<i>instrument_bounds_checkers?</i>:<br>ir_pass.InstrumentBoundsCheckers)
+    bound-->|otherwise|make(ir_pass.MakeAPI)
 end
 end
 bound-->|simple_mode?|res
@@ -114,32 +113,32 @@ res(预处理结果)
 
 以我们的测试代码为例，每一趟后代码发生的变化如下表：
 
-| 阶段 | 处理阶段                  | 是否变化            | 发生的变化                                                 |
-|-----|:-------------------------|:------------------:|:---------------------------------------------------------|
-| 0   |                          |                    | 初始状态                                                  |
-| 1.1 | `StorageFlatten`         | :heavy_check_mark: | `realize` -> `allocate`，指标的表示形式（多维转化为一维）     |
-| 1.2 | `CanonicalSimplify`      | :heavy_check_mark: | 双层`for`循环 -> `TAStoreBuffer2D`                        |
-| 1.3 | （外部过程）               |                    |                                                          |
-| 1.4 | （外部过程）               | :white_check_mark: | 增加了一些新属性                                            |
-| 1.5 | （外部过程）               | :white_check_mark: | 移除了一些属性                                             |
-| 1.6 | （外部过程）               | :heavy_check_mark: | 缓冲区内存分配从`produce`块中移出                            |
-| 1.7 | （外部过程）               |                    | 增加同步属性                                               |
-| 1.8 | （外部过程）               | :heavy_check_mark: | `A`、`B`、`C`的分配合并成`A`的分配                           |
-| 1.9 | （外部过程）               |                    |                                                          |
-| 2.1 | `LoopPartition`          |                    |                                                          |
-| 2.2 | `VectorizeLoop`          |                    |                                                          |
-| 2.3 | `InjectVirtualThread`    |                    |                                                          |
-| 2.4 | `InjectDoubleBuffer`     |                    |                                                          |
-| 2.5 | `StorageRewrite`         |                    |                                                          |
-| 2.6 | `UnrollLoop`             | :heavy_check_mark: | 循环转化为`VTAUopLoopBegin`、`VTAUopPush`和`VTAUopLoopEnd` |
-| 2.7 | （外部过程）               |                    |                                                          |
-| 3.1 | `Simplify`               | :heavy_check_mark: | 缓冲区内存分配完全移除                                       |
-| 3.2 | `LowerStorageAccessInfo` |                    |                                                          |
-| 3.3 | `RemoveNoOp`             |                    |                                                          |
-| 3.4 | `RewriteUnsafeSelect`    |                    |                                                          |
-| 3.5 | （外部过程）               |                    |                                                          |
-| 3.6 | （外部过程）               |                    |                                                          |
-| 4   |                          |                    | 最终状态                                                  |
+| 阶段 | 处理阶段                 |      是否变化      | 发生的变化                                                 |
+| ---- | :----------------------- | :----------------: | :--------------------------------------------------------- |
+| 0    |                          |                    | 初始状态                                                   |
+| 1.1  | `StorageFlatten`         | :heavy_check_mark: | `realize` -> `allocate`，指标的表示形式（多维转化为一维）  |
+| 1.2  | `CanonicalSimplify`      | :heavy_check_mark: | 双层`for`循环 -> `TAStoreBuffer2D`                         |
+| 1.3  | （外部过程）             |                    |                                                            |
+| 1.4  | （外部过程）             | :white_check_mark: | 增加了一些新属性                                           |
+| 1.5  | （外部过程）             | :white_check_mark: | 移除了一些属性                                             |
+| 1.6  | （外部过程）             | :heavy_check_mark: | 缓冲区内存分配从`produce`块中移出                          |
+| 1.7  | （外部过程）             |                    | 增加同步属性                                               |
+| 1.8  | （外部过程）             | :heavy_check_mark: | `A`、`B`、`C`的分配合并成`A`的分配                         |
+| 1.9  | （外部过程）             |                    |                                                            |
+| 2.1  | `LoopPartition`          |                    |                                                            |
+| 2.2  | `VectorizeLoop`          |                    |                                                            |
+| 2.3  | `InjectVirtualThread`    |                    |                                                            |
+| 2.4  | `InjectDoubleBuffer`     |                    |                                                            |
+| 2.5  | `StorageRewrite`         |                    |                                                            |
+| 2.6  | `UnrollLoop`             | :heavy_check_mark: | 循环转化为`VTAUopLoopBegin`、`VTAUopPush`和`VTAUopLoopEnd` |
+| 2.7  | （外部过程）             |                    |                                                            |
+| 3.1  | `Simplify`               | :heavy_check_mark: | 缓冲区内存分配完全移除                                     |
+| 3.2  | `LowerStorageAccessInfo` |                    |                                                            |
+| 3.3  | `RemoveNoOp`             |                    |                                                            |
+| 3.4  | `RewriteUnsafeSelect`    |                    |                                                            |
+| 3.5  | （外部过程）             |                    |                                                            |
+| 3.6  | （外部过程）             |                    |                                                            |
+| 4    |                          |                    | 最终状态                                                   |
 
 标明“（外部过程）”是从C++注册的处理过程，在Python的跟踪过程中无法看到。
 {:.info}
@@ -162,8 +161,8 @@ res(预处理结果)
 $$
 \fbox{flist} \xrightarrow{\text{_build_for_device}}
 \left\{\begin{array}{l}
-	\fbox{fhost} \xrightarrow{\text{codegen.build_module}} \\
-	\fbox{mdev} \xrightarrow{\text{import_module}}
+    \fbox{fhost} \xrightarrow{\text{codegen.build_module}} \\
+    \fbox{mdev} \xrightarrow{\text{import_module}}
 \end{array}\right\}
 \to
 \fbox{mhost}
@@ -223,9 +222,9 @@ subgraph LocalSession
 end
 subgraph RPCSession
     load_module-->rpc._LoadRemoteModule
-	rpc._LoadRemoteModule-->RPCSession::HandlePackedCall
-	RPCSession::HandlePackedCall-->RPCModuleLoad
-	RPCModuleLoad-->tvm.rpc.server.load_module
+    rpc._LoadRemoteModule-->RPCSession::HandlePackedCall
+    RPCSession::HandlePackedCall-->RPCModuleLoad
+    RPCModuleLoad-->tvm.rpc.server.load_module
 end
 _LoadFromFile-->file_loading(load binary)
 tvm.rpc.server.load_module-->file_loading
@@ -313,9 +312,9 @@ if path.endswith(".o"): # true
 
 ```python
 # back in module.load
-	path += ".so"
+    path += ".so"
 else: # false
-   	# ...
+       # ...
 return _LoadFromFile(path, fmt)
 ```
 
@@ -396,7 +395,7 @@ name = [path UTF8String];
 ```c++
 // in Module::LoadFromFile
 //   with file_name = ... ("vadd.o.so" with full path)
-// 	      format    = "so"s
+//        format    = "so"s
 std::string fmt = GetFileFormat(file_name, format);
 // "so"s.length() != 0, should just return "so"s
 // fmt = "so"s
@@ -421,5 +420,4 @@ InitContextFunctions([this](const char* fname) { return GetSymbol(fname); });
 // Load the imported modules
 const char* dev_mblob = GetSymbol(runtime::symbol::tvm_dev_mblob);
 if (dev_mblob != nullptr) { /* ... */ }
-
 ```
