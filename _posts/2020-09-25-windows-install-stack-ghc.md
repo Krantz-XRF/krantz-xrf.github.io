@@ -1,6 +1,8 @@
 ---
 title: 在Windows上安装Haskell
-tags: Haskell
+tags:
+- Haskell
+- 编程
 key: 2020-09-25.windows-install-stack-ghc
 ---
 
