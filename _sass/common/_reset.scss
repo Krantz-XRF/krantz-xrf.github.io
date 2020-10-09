@@ -137,8 +137,32 @@ pre, code {
 }
 
 code {
-  font-size: map-get($base, font-size-xs);
+  font-size: map-get($base, font-size);
   line-height: map-get($base, line-height-sm);
+}
+
+h1 > code {
+  font-size: map-get($base, font-size-h1);
+}
+
+h2 > code {
+  font-size: map-get($base, font-size-h2);
+}
+
+h3 > code {
+  font-size: map-get($base, font-size-h3);
+}
+
+h4 > code {
+  font-size: map-get($base, font-size-h4);
+}
+
+h5 > code {
+  font-size: map-get($base, font-size-h5);
+}
+
+h6 > code {
+  font-size: map-get($base, font-size-h6);
 }
 
 figure > img {
