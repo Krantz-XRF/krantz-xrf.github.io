@@ -6,7 +6,7 @@ tags:
 key: 2020-10-09.haskell-operators-explained
 ---
 
-今天的《计算概论（A）：函数式程序设计》课上讲到了运算符和运算符部分应用（operator sectioning）。这里将详细介绍Haskell中和运算符有关的一切，作为补充和备忘。
+今天的《计算概论（A）：函数式程序设计》课上讲到了运算符和运算符部分应用（operator sectioning）。这里将详细总结了Haskell中和运算符有关的大部分内容，作为补充和备忘。
 
 <!--more-->
 
