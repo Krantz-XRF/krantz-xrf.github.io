@@ -201,6 +201,7 @@ exclude:
   - /screenshots
   - /test
   - /vendor
+  - /.vscode
 
 defaults:
   - scope:
