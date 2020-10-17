@@ -195,6 +195,7 @@ exclude:
   - jekyll-text-theme.gemspec
   - package-lock.json
   - package.json
+  - md-convert.py
   - /docs
   - /node_modules
   - /screenshots
