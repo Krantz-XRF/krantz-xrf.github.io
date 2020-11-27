@@ -17,6 +17,12 @@ title: 关于
 
 没准你会想看看我的围棋记谱程序：[Go++](https://github.com/Krantz-XRF/GoPlusPlus)
 
+#### 你也使用Haskell语言吗？
+
+也许你会想看看[FreeType](https://github.com/Krantz-XRF/FreeType)库，这是一个FreeType库的Haskell绑定。这个库目前仍在开发中，不过一些基础功能已经可以使用了。这个库目前尚未发布到Hackage，不过我有一个自己维护的在线Haddock文档，欢迎在[这里](/FreeType)查看。
+
+[Reanimate](https://github.com/Lemmih/reanimate)([Hackage Link](http://hackage.haskell.org/package/reanimate))是一个使用Haskell制作动画的库，我有一些相关代码维护在[reanimate-projects](https://github.com/Krantz-XRF/reanimate-projects)。
+
 #### 你也使用C++语言吗？
 
 也许你会需要一份可用的[clang-format](https://clang.llvm.org/docs/ClangFormat.html)配置文件：[ClangFormatConfig](https://github.com/Krantz-XRF/ClangFormatConfig)
@@ -28,7 +34,3 @@ BasedOnStyle: Microsoft
 ```
 
 又或者，[lava](https://github.com/Krantz-XRF/lava)库可能会帮到你，这个库提供了文本格式化、程序断言以及一套资源管理的基础设施。
-
-#### 你也使用Haskell语言吗？
-
-也许你会想看看[FreeType](https://github.com/Krantz-XRF/FreeType)库，这是一个FreeType库的Haskell绑定。这个库目前仍在开发中，不过一些基础功能已经可以使用了。这个库目前尚未发布到Hackage，不过我有一个自己维护的在线Haddock文档，欢迎在[这里](/FreeType)查看。
